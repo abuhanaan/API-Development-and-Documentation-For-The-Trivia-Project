@@ -101,16 +101,17 @@ def create_app(test_config=None):
             if question is None:
                 abort(404)
 
-            question.delete()
-            selection = Question.query.order_by(Question.category).all()
-            current_questions = paginate_questions(request, selection)
+            else:
+                question.delete()
+                selection = Question.query.order_by(Question.category).all()
+                current_questions = paginate_questions(request, selection)
 
-            return jsonify({
-                'success': True,
-                'deleted': question_id,
-                'questions': current_questions,
-                'total_questions': len(Question.query.all())
-            })
+                return jsonify({
+                    'success': True,
+                    'deleted': question_id,
+                    'questions': current_questions,
+                    'total_questions': len(Question.query.all())
+                })
 
         except:
             abort(422)
@@ -215,7 +216,31 @@ def create_app(test_config=None):
     """
     @app.route('/quiz', methods=['POST'])
     def play_quiz():
-        pass
+        try:
+            body = request.get_json()
+
+            if not ('quiz_category' in body and 'previous_questions' in body):
+                abort(422)
+
+            category = body.get('quiz_category')
+            previous_questions = body.get('previous_questions')
+
+            if category['type'] == 'click':
+                available_questions = Question.query.filter(
+                    Question.id.notin_((previous_questions))).all()
+            else:
+                available_questions = Question.query.filter_by(
+                    category=category['id']).filter(Question.id.notin_((previous_questions))).all()
+
+            new_question = available_questions[random.randrange(
+                0, len(available_questions))].format() if len(available_questions) > 0 else None
+
+            return jsonify({
+                'success': True,
+                'question': new_question
+            })
+        except:
+            abort(422)
 
     """
     @TODO:

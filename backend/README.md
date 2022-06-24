@@ -356,6 +356,28 @@ The API will return three error types when requests fail:
 }
 ```
 
+#### POST /quiz
+* General:
+  * Retrieves a random question withi a specified category.
+  * Previously asked questions are not included
+  * Required arguments: previous_questions, quiz_category
+* Sample: `curl -X POST http://127.0.0.1:5000/quiz-H "Content-Type: application/json" -d '{"previous_questions":"arr","quiz_category": {"id":"1", "type":"string"}}'`
+      
+``` json
+{
+  "question": {
+  "answer": "One",
+  "category": "2",
+  "difficulty": 4,
+  "id": 18,
+  "question": "How many paintings did Van Gogh sell in his lifetime?"
+  },
+  "success" True
+}
+```
+
+
+
 ## Deployment N/A
 ***
 ### Author
